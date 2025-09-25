@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token Miner - Maître de l'univers</title>
+<style>
+body{font-family: Arial, Helvetica, sans-serif;max-width:800px;margin:40px auto;padding:0 20px;color:#111}
+input,button{padding:10px;margin:6px 0;font-size:16px}
+button{cursor:pointer}
+#output, #estimateOutput{background:#f4f4f4;padding:12px;border-radius:6px;margin-top:8px}
+</style>
+</head>
+<body>
+<h1>Token Miner Légal</h1>
+<label>Nom d'utilisateur</label><br>
+<input type="text" id="username" placeholder="MaîtreDeLUnivers"><br>
+<button onclick="mineTokens()">Miner</button>
+<button onclick="convertTokens()">Convertir en ETH (simulation)</button>
+<p id="output"></p>
+
+<h2>Estimation temps pour atteindre un montant</h2>
+<input type="number" id="targetUSD" placeholder="Montant cible $"><br>
+<input type="number" id="avgTokens" placeholder="Tokens par mine"><br>
+<input type="number" id="minesPerDay" placeholder="Mines par jour"><br>
+<button onclick="estimateTime()">Estimer</button>
+<p id="estimateOutput"></p>
+
+<script>
+async function apiPost(path, body) {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function mineTokens() {
+  const username = document.getElementById("username").value || "MaîtreDeLUnivers";
+  const data = await apiPost("/mine", { username });
+  document.getElementById("output").innerText = data.message + " Total tokens: " + data.totalTokens;
+}
+
+async function convertTokens() {
+  const username = document.getElementById("username").value || "MaîtreDeLUnivers";
+  const data = await apiPost("/convert", { username });
+  document.getElementById("output").innerText = data.message;
+}
+
+async function estimateTime() {
+  const targetUSD = Number(document.getElementById("targetUSD").value) || 1000;
+  const avgTokensPerMine = Number(document.getElementById("avgTokens").value) || 5;
+  const minesPerDay = Number(document.getElementById("minesPerDay").value) || 100;
+
+  const data = await apiPost("/estimate", { targetUSD, avgTokensPerMine, minesPerDay });
+  document.getElementById("estimateOutput").innerText = data.message;
+}
+</script>
+</body>
+</html>
